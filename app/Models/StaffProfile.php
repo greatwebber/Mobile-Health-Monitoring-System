@@ -20,6 +20,11 @@ class StaffProfile extends Model
         'phone',
     ];
 
+    public static function numberFor(User $user): string
+    {
+        return sprintf('FPE-MC-STAFF-%06d', $user->getKey());
+    }
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

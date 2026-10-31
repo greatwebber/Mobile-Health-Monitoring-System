@@ -97,7 +97,7 @@
                 </x-slot>
             </x-bottom-nav-item>
         @elseif ($isAdministrator)
-            <x-bottom-nav-item label="Accounts" disabled>
+            <x-bottom-nav-item :href="route('admin.accounts.index')" label="Accounts" :active="request()->routeIs('admin.accounts.*')">
                 <x-slot name="icon">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.9" d="M9.5 11a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Zm7-1a2.75 2.75 0 1 0 0-5.5M3.5 20c.4-3.8 2.5-6 6-6s5.6 2.2 6 6m1-6c2.5.2 3.8 2 4 4.5"/></svg>
                 </x-slot>

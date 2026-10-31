@@ -82,13 +82,13 @@
                         <span class="mt-1 block text-xs leading-5 text-slate-500">Keep personal details current</span>
                     </a>
                 @elseif ($isAdministrator)
-                <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm opacity-70">
+                <a href="{{ route('admin.accounts.index') }}" class="group rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-teal-200 hover:shadow-lg hover:shadow-teal-950/5 focus:outline-none focus-visible:ring-4 focus-visible:ring-teal-200">
                     <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-rose-100 text-rose-700">
                         <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.9" d="M12 12.5a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm-7 8c.7-3.4 3.3-5.5 7-5.5s6.3 2.1 7 5.5"/></svg>
                     </span>
                     <span class="mt-3 block text-sm font-black text-slate-900">User accounts</span>
-                    <span class="mt-1 block text-xs leading-5 text-slate-500">Administration module is upcoming</span>
-                </div>
+                    <span class="mt-1 block text-xs leading-5 text-slate-500">Manage identity and staff access</span>
+                </a>
                 @else
                     <a href="{{ route('encounters.index') }}" class="group rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-teal-200 hover:shadow-lg hover:shadow-teal-950/5 focus:outline-none focus-visible:ring-4 focus-visible:ring-teal-200">
                         <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-teal-100 text-teal-800">

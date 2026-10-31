@@ -8,6 +8,7 @@ use App\Http\Controllers\ConsentController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EncounterObservationController;
 use App\Http\Controllers\HealthTimelineController;
+use App\Http\Controllers\ManagedAccountController;
 use App\Http\Controllers\MedicalHistoryController;
 use App\Http\Controllers\PatientProfileController;
 use App\Http\Controllers\ProfileController;
@@ -46,6 +47,11 @@ Route::middleware(['auth', 'audit.access'])->group(function () {
     Route::post('/threshold-rules/{thresholdRule}/approve', [ThresholdRuleController::class, 'approve'])->name('threshold-rules.approve');
     Route::post('/threshold-rules/{thresholdRule}/deactivate', [ThresholdRuleController::class, 'deactivate'])->name('threshold-rules.deactivate');
     Route::get('/audit-logs', [AuditLogController::class, 'index'])->name('audit-logs.index');
+    Route::get('/admin/accounts', [ManagedAccountController::class, 'index'])->name('admin.accounts.index');
+    Route::get('/admin/accounts/create', [ManagedAccountController::class, 'create'])->name('admin.accounts.create');
+    Route::post('/admin/accounts', [ManagedAccountController::class, 'store'])->name('admin.accounts.store');
+    Route::get('/admin/accounts/{managedUser}/edit', [ManagedAccountController::class, 'edit'])->name('admin.accounts.edit');
+    Route::put('/admin/accounts/{managedUser}', [ManagedAccountController::class, 'update'])->name('admin.accounts.update');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
