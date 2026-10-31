@@ -107,6 +107,14 @@
                     <span class="mt-3 block text-sm font-black text-slate-900">Record vitals</span>
                     <span class="mt-1 block text-xs leading-5 text-slate-500">Coming with health monitoring</span>
                 </div>
+                @elseif ($isAdministrator)
+                <a href="{{ route('audit-logs.index') }}" class="group rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-rose-200 hover:shadow-lg hover:shadow-rose-950/5 focus:outline-none focus-visible:ring-4 focus-visible:ring-rose-200">
+                    <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-rose-100 text-rose-700 transition group-hover:bg-rose-700 group-hover:text-white">
+                        <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.9" d="M6 3h9l3 3v15H6V3Zm3 7h6m-6 4h6m-6 4h4"/></svg>
+                    </span>
+                    <span class="mt-3 block text-sm font-black text-slate-900">Audit trail</span>
+                    <span class="mt-1 block text-xs leading-5 text-slate-500">Review sensitive access and changes</span>
+                </a>
                 @else
                 <a href="{{ route('encounters.create') }}" class="group rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-rose-200 hover:shadow-lg hover:shadow-rose-950/5 focus:outline-none focus-visible:ring-4 focus-visible:ring-rose-200">
                     <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-rose-100 text-rose-700 transition group-hover:bg-rose-700 group-hover:text-white">
@@ -117,13 +125,23 @@
                 </a>
                 @endif
 
+                @if ($canViewAppointments)
+                <a href="{{ route('appointments.index') }}" class="group rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-amber-200 hover:shadow-lg hover:shadow-amber-950/5 focus:outline-none focus-visible:ring-4 focus-visible:ring-amber-200">
+                    <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-100 text-amber-800">
+                        <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.9" d="M7 3v3m10-3v3M4.5 9.5h15M6 5h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2Z"/></svg>
+                    </span>
+                    <span class="mt-3 block text-sm font-black text-slate-900">Appointments</span>
+                    <span class="mt-1 block text-xs leading-5 text-slate-500">{{ $isPatient ? 'Review confirmed visits' : 'Coordinate follow-up care' }}</span>
+                </a>
+                @else
                 <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm opacity-70">
                     <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-100 text-amber-800">
                         <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.9" d="M7 3v3m10-3v3M4.5 9.5h15M6 5h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2Z"/></svg>
                     </span>
-                    <span class="mt-3 block text-sm font-black text-slate-900">{{ $isPatient ? 'Book visit' : 'Appointments' }}</span>
-                    <span class="mt-1 block text-xs leading-5 text-slate-500">Scheduling is not enabled yet</span>
+                    <span class="mt-3 block text-sm font-black text-slate-900">Appointments</span>
+                    <span class="mt-1 block text-xs leading-5 text-slate-500">Clinical access is separated</span>
                 </div>
+                @endif
 
                 <a href="{{ route('profile.edit') }}" class="group rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-sky-200 hover:shadow-lg hover:shadow-sky-950/5 focus:outline-none focus-visible:ring-4 focus-visible:ring-sky-200">
                     <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-sky-100 text-sky-800 transition group-hover:bg-sky-700 group-hover:text-white">
@@ -152,14 +170,14 @@
                 <p class="mt-5 text-3xl font-black tracking-tight {{ $activeAlerts > 0 ? 'text-rose-950' : 'text-emerald-950' }}">{{ $canViewAlerts ? $activeAlerts : '—' }}</p>
                 <p class="mt-1 text-xs font-semibold {{ $activeAlerts > 0 ? 'text-rose-700' : 'text-emerald-700' }}">{{ ! $canViewAlerts ? 'Clinical access is separated' : ($activeAlerts > 0 ? 'Review required' : 'Nothing needs attention') }}</p>
             </{{ $canViewAlerts ? 'a' : 'article' }}>
-            <article class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <{{ $canViewAppointments ? 'a' : 'article' }} @if ($canViewAppointments) href="{{ route('appointments.index') }}" @endif class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition {{ $canViewAppointments ? 'hover:-translate-y-0.5 hover:border-amber-200 hover:shadow-md focus:outline-none focus-visible:ring-4 focus-visible:ring-amber-200' : '' }}">
                 <div class="flex items-start justify-between">
                     <p class="text-xs font-bold uppercase tracking-wider text-slate-500">Appointments</p>
                     <span class="h-2 w-2 rounded-full bg-slate-300"></span>
                 </div>
-                <p class="mt-5 text-3xl font-black tracking-tight text-slate-950">—</p>
-                <p class="mt-1 text-xs font-medium text-slate-500">No upcoming visit</p>
-            </article>
+                <p class="mt-5 text-3xl font-black tracking-tight text-slate-950">{{ $canViewAppointments ? $upcomingAppointments : '—' }}</p>
+                <p class="mt-1 text-xs font-medium text-slate-500">{{ $nextAppointment ? 'Next: '.$nextAppointment->scheduled_at->format('j M, g:i a') : ($canViewAppointments ? 'No upcoming visit' : 'Clinical access is separated') }}</p>
+            </{{ $canViewAppointments ? 'a' : 'article' }}>
             <article class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
                 <div class="flex items-start justify-between">
                     <p class="text-xs font-bold uppercase tracking-wider text-slate-500">Risk reviews</p>

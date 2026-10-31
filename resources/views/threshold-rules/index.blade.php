@@ -5,7 +5,7 @@
         <div>
             <p class="text-xs font-black uppercase tracking-[0.18em] text-teal-700">Clinical governance</p>
             <h1 class="mt-2 text-3xl font-black tracking-tight text-slate-950">Threshold rule registry</h1>
-            <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-600">Drafts are created by administrators but cannot generate alerts until an authorized clinician reviews and approves them. Approved rules are immutable and may only be deactivated.</p>
+            <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-600">Drafts are created by administrators but cannot generate alerts until an authorized clinician reviews and approves them. Approved rules are immutable, apply only to measurements recorded after activation and may only be deactivated.</p>
         </div>
 
         @if (session('status'))

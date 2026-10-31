@@ -83,4 +83,9 @@ class ClinicalEncounter extends Model
     {
         return $this->hasMany(ClinicalAlert::class);
     }
+
+    public function appointments(): HasMany
+    {
+        return $this->hasMany(Appointment::class);
+    }
 }

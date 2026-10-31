@@ -22,7 +22,7 @@ class BottomNavigationTest extends TestCase
             ->assertSee('data-testid="bottom-navigation"', escape: false)
             ->assertSee('data-nav-label="Home"', escape: false)
             ->assertSee('data-nav-label="Profile"', escape: false)
-            ->assertSee('data-nav-label="Record"', escape: false)
+            ->assertSee('data-nav-label="Appointments"', escape: false)
             ->assertSee('data-nav-label="Timeline"', escape: false)
             ->assertSee('data-nav-label="Visits"', escape: false)
             ->assertDontSee('data-nav-label="Patients"', escape: false);
@@ -40,8 +40,22 @@ class BottomNavigationTest extends TestCase
             ->assertSee('data-nav-label="Patients"', escape: false)
             ->assertSee('data-nav-label="Triage"', escape: false)
             ->assertSee('data-nav-label="Alerts"', escape: false)
-            ->assertSee('data-nav-label="Reports"', escape: false)
+            ->assertSee('data-nav-label="Appointments"', escape: false)
             ->assertDontSee('data-nav-label="Profile"', escape: false);
+    }
+
+    public function test_administrator_navigation_exposes_governance_without_clinical_actions(): void
+    {
+        $administrator = User::factory()->administrator()->create();
+
+        $this->actingAs($administrator)
+            ->get(route('dashboard'))
+            ->assertOk()
+            ->assertSee('data-nav-label="Rules"', escape: false)
+            ->assertSee('data-nav-label="Audit"', escape: false)
+            ->assertSee('Audit trail')
+            ->assertDontSee('data-nav-label="Triage"', escape: false)
+            ->assertDontSee('Start triage');
     }
 
     public function test_active_dock_item_is_exposed_to_assistive_technology(): void

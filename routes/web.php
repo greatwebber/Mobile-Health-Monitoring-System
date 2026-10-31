@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\AppointmentController;
+use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\ClinicalAlertController;
 use App\Http\Controllers\ClinicalEncounterController;
 use App\Http\Controllers\ConsentController;
@@ -17,10 +19,10 @@ Route::get('/', function () {
 })->name('home');
 
 Route::get('/dashboard', DashboardController::class)
-    ->middleware(['auth', 'verified'])
+    ->middleware(['auth', 'verified', 'audit.access'])
     ->name('dashboard');
 
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'audit.access'])->group(function () {
     Route::get('/health-profile', [PatientProfileController::class, 'edit'])->name('patient-profile.edit');
     Route::patch('/health-profile', [PatientProfileController::class, 'update'])->name('patient-profile.update');
     Route::get('/medical-history', [MedicalHistoryController::class, 'edit'])->name('medical-history.edit');
@@ -33,6 +35,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/encounters/{encounter}/clinical-results', [EncounterObservationController::class, 'storeClinicalResult'])->name('encounters.clinical-results.store');
     Route::get('/timeline', [HealthTimelineController::class, 'index'])->name('timeline.index');
     Route::get('/patients/{patientProfile}/timeline', [HealthTimelineController::class, 'show'])->name('timeline.patient');
+    Route::resource('appointments', AppointmentController::class)->except(['destroy']);
+    Route::post('/appointments/{appointment}/status', [AppointmentController::class, 'transition'])->name('appointments.transition');
     Route::get('/alerts', [ClinicalAlertController::class, 'index'])->name('alerts.index');
     Route::get('/alerts/{alert}', [ClinicalAlertController::class, 'show'])->name('alerts.show');
     Route::post('/alerts/{alert}/acknowledge', [ClinicalAlertController::class, 'acknowledge'])->name('alerts.acknowledge');
@@ -41,6 +45,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/threshold-rules', [ThresholdRuleController::class, 'store'])->name('threshold-rules.store');
     Route::post('/threshold-rules/{thresholdRule}/approve', [ThresholdRuleController::class, 'approve'])->name('threshold-rules.approve');
     Route::post('/threshold-rules/{thresholdRule}/deactivate', [ThresholdRuleController::class, 'deactivate'])->name('threshold-rules.deactivate');
+    Route::get('/audit-logs', [AuditLogController::class, 'index'])->name('audit-logs.index');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

@@ -51,7 +51,7 @@ This document is also the project's living implementation tracker. Update it whe
 | 2. Ethics, Privacy and Data Planning | Weeks 2–3 | Not started | — | — |
 | 3. UX, PWA Design and Architecture | Weeks 3–4 | In progress | — | Original mobile-first shell, role-aware bottom navigation and reload-free Turbo navigation implemented; formal wireframes and stakeholder review pending |
 | 4. Engineering Foundation | Weeks 4–6 | In progress | — | Laravel, authentication, account roles, tests and PWA shell implemented |
-| 5. Clinical Monitoring MVP | Weeks 6–9 | In progress | — | Core clinical records, longitudinal timeline and verified vital-sign trend charts implemented; threshold alerts are next |
+| 5. Clinical Monitoring MVP | Weeks 6–9 | In progress | — | End-to-end non-AI monitoring, follow-up and immutable audit trail implemented; staff-administration UI and formal stakeholder review remain |
 | 6. Offline-Aware PWA Completion | Weeks 8–10 | In progress | — | Safe static caching, offline fallback and connection status implemented; offline drafts pending |
 | 7. AI Research Pipeline | Weeks 7–11 | Not started | — | — |
 | 8. AI Service and Product Integration | Weeks 11–13 | Not started | — | — |
@@ -76,6 +76,9 @@ Add one row for every meaningful roadmap update.
 | 2026-10-31 | 3 and 6 | Delayed PWA navigation feedback implemented | The authenticated app bar now shows an accessible circular loader for internal page transitions and valid form submissions after a 180 ms anti-flicker delay; external, download, hash-only and new-tab links are excluded, browser restoration resets state, and reduced-motion preferences are respected. Production build, audits and 73 automated tests with 369 assertions passed | Development team |
 | 2026-10-31 | 3, 4 and 6 | Reload-free Turbo navigation implemented | Same-origin links and forms now use Turbo Drive background requests and body replacement while preserving Laravel-rendered HTML and browser history. Sensitive page snapshot caching and hover prefetching are disabled, versioned asset changes force a controlled reload, and the custom app-bar loader follows Turbo lifecycle events. Production build, dependency audits and 74 automated tests with 378 assertions passed | Development team |
 | 2026-10-31 | 5 | Longitudinal timeline and trend charts implemented | Patients can review their own combined visit, symptom, vital-sign and result history; nurses and clinicians can open an authorized patient timeline while administrators and unrelated patients are denied. Chart.js renders verified trends and is loaded only on demand for low-bandwidth PWA performance. Repeat seeding, production build, audits and 80 automated tests with 406 assertions passed | Development team |
+| 2026-10-31 | 5 | Clinician-approved threshold alerts implemented | Administrators can prepare immutable threshold drafts, clinicians independently approve or deactivate them, and only active approved rules evaluate newly recorded vital signs. Nurses and clinicians can acknowledge alerts, only clinicians can resolve them with notes, and patients can view only their own. No clinical rule is active by default; the fictional seed rule remains an inactive draft. MySQL migration, repeat seeding, production build, dependency audits and 87 automated tests with 473 assertions passed | Development team |
+| 2026-10-31 | 5 | Appointment and follow-up workflow implemented | Nurses and clinicians can schedule or reschedule future appointments, link follow-up to the originating encounter, assign a clinician and provide patient-visible instructions. Patients can review only their own schedule. Completion, cancellation and non-attendance require documented outcomes and become immutable; future visits cannot be falsely completed or marked as missed. Dashboard summaries, role-specific PWA navigation and one fictional upcoming appointment are included. MySQL migration, repeat seeding, production build, dependency audits and 93 automated tests with 510 assertions passed | Development team |
+| 2026-10-31 | 2, 4 and 5 | Immutable security and clinical audit trail implemented | Authentication success/failure/logout, authenticated sensitive-page access attempts and meaningful clinical record changes now create append-only audit events with actor, resource, route, request and network context. Metadata records changed field names without copying clinical values; failed-login identifiers are hashed. Only active administrators can search the responsive audit trail, and no mutation routes exist. MySQL migration, repeat seeding, production build, dependency audits and 99 automated tests with 553 assertions passed | Development team |
 
 ---
 
@@ -406,6 +409,7 @@ The first database design should include the following entities:
 | `symptom_entries` | Structured symptoms and duration |
 | `laboratory_results` | Relevant investigation results and units |
 | `appointments` | Scheduled consultations and follow-ups |
+| `threshold_rules` | Versioned clinical measurement rules with separate creation, approval and deactivation provenance |
 | `alerts` | Threshold events, priority, ownership and resolution |
 | `predictions` | Inputs reference, output, model version and timestamp |
 | `prediction_explanations` | Important contributing factors and display content |
@@ -651,8 +655,8 @@ The prediction study should be documented using the current TRIPOD+AI reporting 
 
 - [x] Initialize Git and the Laravel application. — Laravel 12.70.2 application initialized on the `main` branch.
 - [~] Configure environment management and MySQL. — Local environment and SQLite are ready; dedicated MySQL configuration remains pending.
-- [x] Create migrations, factories and safe seed data. — Account, profile, consent, medical-history and encounter migrations/factories are ready; environment-gated fictional accounts and clinical data seed without duplication.
-- [~] Implement authentication, roles and authorization policies. — Authentication, four role types, active-account enforcement, profile, consent, medical-history, encounter, observation and clinical-result policies are ready; future timeline, alert and appointment resources will require their own policies.
+- [x] Create migrations, factories and safe seed data. — Account, profile, consent, medical-history, encounter, observation, result, alert-governance and appointment migrations/factories are ready; environment-gated fictional data seeds without duplication and without activating clinical rules.
+- [x] Implement authentication, roles and authorization policies. — Authentication, four role types, active-account enforcement and least-privilege policies cover every currently implemented clinical resource, including appointments.
 - [~] Establish application layout, CI checks and test framework. — Original responsive layouts, Turbo Drive navigation and PHPUnit are ready; continuous-integration configuration remains pending.
 - [x] Add manifest, icons, base service worker and offline fallback. — Manifest, four original PNG icons, service worker and branded offline page verified.
 
@@ -660,9 +664,9 @@ The prediction study should be documented using the current TRIPOD+AI reporting 
 
 - [x] Reproducible local setup. — Installation and XAMPP guidance documented in `README.md`.
 - [x] Secure authentication and role foundation. — Registration is patient-only; inactive accounts cannot authenticate.
-- [x] Initial database schema. — Authentication, sessions, jobs, cache, account authorization, patient/staff profiles, consent history, medical history, encounters, symptoms, vital-sign observations and clinical results migrated successfully.
+- [x] Initial database schema. — Authentication, sessions, jobs, cache, account authorization, patient/staff profiles, consent history, medical history, encounters, observations, results, threshold rules, clinical alerts and appointments migrated successfully.
 - [~] Installable PWA shell. — Technical installability requirements are implemented; representative-device installation verification remains pending.
-- [x] Automated baseline test suite. — 80 tests and 406 assertions pass; PHP and JavaScript dependency audits report no known vulnerabilities.
+- [x] Automated baseline test suite. — 99 tests and 553 assertions pass; PHP and JavaScript dependency audits report no known vulnerabilities.
 
 **Exit criteria**
 
@@ -676,21 +680,21 @@ The prediction study should be documented using the current TRIPOD+AI reporting 
 - [x] Implement consent, medical history and encounters. — Versioned append-only consent, patient-managed structured history and role-protected encounter lifecycle are implemented and tested; institutional approval of final consent wording remains tracked in Phase 2.
 - [x] Implement symptoms, vital signs and relevant results. — Append-only structured symptoms, verified vital-sign snapshots and numeric/qualitative clinical results are implemented with units, timestamps, provenance and safe validation; flags are reproduced from source reports rather than inferred.
 - [x] Build the longitudinal timeline and trend charts. — Encounters, symptoms, verified vital signs and clinical results are combined chronologically; responsive Chart.js trends are restricted to verified measurements and loaded on demand.
-- [ ] Add clinician-approved threshold alerts and resolution workflow.
-- [ ] Implement appointments and follow-up actions.
-- [ ] Add audit events to sensitive workflows.
+- [x] Add clinician-approved threshold alerts and resolution workflow. — Administrators create inactive immutable drafts; clinicians independently activate/deactivate rules; newly recorded vitals are evaluated server-side against active approved rules. Alerts preserve the rule snapshot, support nurse/clinician acknowledgement and require clinician resolution notes. No rule is active by default.
+- [x] Implement appointments and follow-up actions. — Authorized clinical staff schedule or reschedule future visits, optionally connect them to the originating encounter, assign clinicians and publish patient instructions. Documented completion, cancellation and non-attendance outcomes are final; patient access is ownership-scoped.
+- [x] Add audit events to sensitive workflows. — Authentication events, sensitive authenticated GET attempts and semantic clinical changes are captured in an append-only trail. Logs store actor/resource/request context and changed field names without duplicating clinical values; only administrators can review them.
 
 **Deliverables**
 
-- [ ] End-to-end patient monitoring workflow.
-- [~] Mobile-responsive dashboards. — Patient/staff home experiences, encounter workspace and longitudinal timeline are responsive; alert and appointment summaries remain pending.
-- [~] Health charts and alerts. — Responsive verified vital-sign trend charts are complete; clinician-approved threshold alerts remain pending.
-- [ ] Appointment and clinical-review functions.
-- [~] Permission and workflow tests. — Profile, consent, medical-history, encounter, observation, result and timeline ownership, validation and least-privilege rules are covered; alert and appointment workflows remain pending.
+- [x] End-to-end patient monitoring workflow. — The demonstrated non-AI journey covers patient identity, consent/history, encounter capture, verified observations/results, trends, governed alerts and scheduled follow-up.
+- [x] Mobile-responsive dashboards. — Patient, clinical and administrator home experiences, encounter workspace, longitudinal timeline, active alerts and upcoming appointments are responsive.
+- [x] Health charts and alerts. — Responsive verified vital-sign trends and the governed threshold-alert review workflow are complete.
+- [~] Appointment and clinical-review functions. — Appointment follow-up and alert review are complete; AI prediction review belongs to Phase 8.
+- [x] Permission and workflow tests. — Profile, consent, medical-history, encounter, observation, result, timeline, threshold governance, alert and appointment ownership/workflow boundaries are covered.
 
 **Exit criteria**
 
-- [ ] A patient journey can be demonstrated without the AI component.
+- [x] A patient journey can be demonstrated without the AI component. — Automated feature tests cover the workflow; formal stakeholder demonstration remains tracked under pilot evaluation.
 
 ### Phase 6 — Offline-Aware PWA Completion (Weeks 8–10)
 

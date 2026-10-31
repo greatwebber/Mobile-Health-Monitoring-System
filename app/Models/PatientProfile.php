@@ -67,6 +67,11 @@ class PatientProfile extends Model
         return $this->hasMany(ClinicalAlert::class);
     }
 
+    public function appointments(): HasMany
+    {
+        return $this->hasMany(Appointment::class);
+    }
+
     public function latestConsent(ConsentType $type): ?ConsentRecord
     {
         return $this->consentRecords()

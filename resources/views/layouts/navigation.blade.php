@@ -79,9 +79,9 @@
                 </x-slot>
             </x-bottom-nav-item>
 
-            <x-bottom-nav-item label="Record" disabled prominent>
+            <x-bottom-nav-item :href="route('appointments.index')" label="Appointments" :active="request()->routeIs('appointments.*')" prominent>
                 <x-slot name="icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-width="2.2" d="M12 6v12M6 12h12"/></svg>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.9" d="M7 3v3m10-3v3M4.5 9.5h15M6 5h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2Z"/></svg>
                 </x-slot>
             </x-bottom-nav-item>
 
@@ -109,7 +109,7 @@
                 </x-slot>
             </x-bottom-nav-item>
 
-            <x-bottom-nav-item label="Audit" disabled>
+            <x-bottom-nav-item :href="route('audit-logs.index')" label="Audit" :active="request()->routeIs('audit-logs.*')">
                 <x-slot name="icon">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.9" d="M6 3h9l3 3v15H6V3Zm3 7h6m-6 4h6m-6 4h4"/></svg>
                 </x-slot>
@@ -139,9 +139,9 @@
                 </x-slot>
             </x-bottom-nav-item>
 
-            <x-bottom-nav-item label="Reports" disabled>
+            <x-bottom-nav-item :href="route('appointments.index')" label="Appointments" :active="request()->routeIs('appointments.*')">
                 <x-slot name="icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.9" d="M5 20V10m7 10V4m7 16v-7"/></svg>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.9" d="M7 3v3m10-3v3M4.5 9.5h15M6 5h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2Z"/></svg>
                 </x-slot>
             </x-bottom-nav-item>
         @endif

@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Enums\AlertSeverity;
+use App\Enums\AppointmentStatus;
 use App\Enums\BloodGroup;
 use App\Enums\ClinicalResultCategory;
 use App\Enums\ClinicalResultFlag;
@@ -14,6 +15,7 @@ use App\Enums\ObservationSource;
 use App\Enums\SexAtBirth;
 use App\Enums\SymptomSeverity;
 use App\Enums\VitalMetric;
+use App\Models\Appointment;
 use App\Models\ClinicalEncounter;
 use App\Models\ClinicalResult;
 use App\Models\EncounterSymptom;
@@ -237,6 +239,21 @@ class DemoProfileSeeder extends Seeder
                 'guidance' => 'Fictional local demonstration rule only. Replace with institutionally approved clinical guidance before activation.',
                 'is_active' => false,
                 'created_by_user_id' => $administrator->id,
+            ],
+        );
+
+        Appointment::query()->firstOrCreate(
+            ['appointment_number' => 'FPE-MC-A-DEMO-0001'],
+            [
+                'patient_profile_id' => $patientProfile->id,
+                'clinical_encounter_id' => $demoEncounter->id,
+                'assigned_clinician_id' => $clinician->id,
+                'scheduled_at' => now()->addDays(3)->setTime(10, 0),
+                'duration_minutes' => 30,
+                'reason' => 'Fictional routine follow-up after the demonstration encounter.',
+                'patient_instructions' => 'Fictional demonstration only. Please arrive ten minutes before the scheduled time.',
+                'status' => AppointmentStatus::Scheduled,
+                'scheduled_by_user_id' => $nurse->id,
             ],
         );
     }

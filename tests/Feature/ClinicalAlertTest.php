@@ -37,6 +37,10 @@ class ClinicalAlertTest extends TestCase
         $this->assertNotSame($draft->id, $alert->threshold_rule_id);
         $this->assertSame(AlertStatus::Open, $alert->status);
         $this->assertSame('38.2000', $alert->measured_value);
+
+        $inRangeObservation = VitalSignObservation::factory()->create(['temperature_c' => 37.2]);
+        $this->assertCount(0, $evaluator->evaluate($inRangeObservation));
+        $this->assertDatabaseCount('clinical_alerts', 1);
     }
 
     public function test_recording_vitals_evaluates_approved_rules_automatically(): void

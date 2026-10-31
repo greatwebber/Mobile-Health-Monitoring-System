@@ -31,6 +31,8 @@ class DemoAccountSeederTest extends TestCase
         $this->assertDatabaseCount('clinical_results', 1);
         $this->assertDatabaseCount('threshold_rules', 1);
         $this->assertDatabaseCount('clinical_alerts', 0);
+        $this->assertDatabaseCount('appointments', 1);
+        $this->assertDatabaseCount('audit_logs', 0);
 
         $expectedRoles = [
             'admin@edehealth.test' => UserRole::Administrator,
@@ -67,5 +69,7 @@ class DemoAccountSeederTest extends TestCase
         $this->assertDatabaseCount('clinical_results', 1);
         $this->assertDatabaseCount('threshold_rules', 1);
         $this->assertDatabaseCount('clinical_alerts', 0);
+        $this->assertDatabaseCount('appointments', 1);
+        $this->assertDatabaseCount('audit_logs', 0);
     }
 }

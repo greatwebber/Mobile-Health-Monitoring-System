@@ -46,6 +46,9 @@
                         <a href="{{ route('encounters.edit', $encounter) }}" class="mt-4 inline-flex min-h-11 items-center rounded-xl bg-teal-400 px-4 font-black text-slate-950 transition hover:bg-teal-300">Continue documentation</a>
                     @endcan
                     <a href="{{ $timelineRoute }}" class="mt-2 inline-flex min-h-11 items-center rounded-xl border border-white/20 px-4 font-black text-white transition hover:bg-white/10">View health timeline</a>
+                    @can('create', App\Models\Appointment::class)
+                        <a href="{{ route('appointments.create', ['patient' => $encounter->patient_profile_id, 'encounter' => $encounter->id]) }}" class="mt-2 inline-flex min-h-11 items-center rounded-xl border border-white/20 px-4 font-black text-white transition hover:bg-white/10">Schedule follow-up</a>
+                    @endcan
                 </div>
             </div>
         </section>
