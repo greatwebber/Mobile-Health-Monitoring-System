@@ -52,9 +52,9 @@
                         <p class="mt-0.5 truncate text-xs text-slate-500">{{ Auth::user()->email }}</p>
                     </div>
                     <x-dropdown-link :href="route('profile.edit')">{{ __('Account settings') }}</x-dropdown-link>
-                    <form method="POST" action="{{ route('logout') }}">
+                    <form method="POST" action="{{ route('logout') }}" data-clear-private-drafts>
                         @csrf
-                        <x-dropdown-link :href="route('logout')" onclick="event.preventDefault(); this.closest('form').submit();">
+                        <x-dropdown-link :href="route('logout')" onclick="event.preventDefault(); this.closest('form').requestSubmit();">
                             {{ __('Sign out securely') }}
                         </x-dropdown-link>
                     </form>

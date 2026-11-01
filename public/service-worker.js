@@ -1,18 +1,23 @@
-const CACHE_VERSION = 'edehealth-static-v1';
+const CACHE_VERSION = 'edehealth-static-v3';
 const OFFLINE_URL = new URL('./offline.html', self.location.href).href;
 const STATIC_ASSETS = [
     OFFLINE_URL,
     new URL('./manifest.webmanifest', self.location.href).href,
     new URL('./icons/icon-192.png', self.location.href).href,
+    new URL('./icons/icon-maskable-192.png', self.location.href).href,
     new URL('./icons/icon-512.png', self.location.href).href,
+    new URL('./icons/icon-maskable-512.png', self.location.href).href,
 ];
 
 self.addEventListener('install', (event) => {
     event.waitUntil(
         caches.open(CACHE_VERSION)
-            .then((cache) => cache.addAll(STATIC_ASSETS))
-            .then(() => self.skipWaiting()),
+            .then((cache) => cache.addAll(STATIC_ASSETS)),
     );
+});
+
+self.addEventListener('message', (event) => {
+    if (event.data?.type === 'SKIP_WAITING') self.skipWaiting();
 });
 
 self.addEventListener('activate', (event) => {

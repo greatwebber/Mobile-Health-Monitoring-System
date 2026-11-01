@@ -143,5 +143,6 @@
             </footer>
         </div>
         <div id="connection-status" class="connection-status" role="status" aria-live="polite" hidden></div>
+        @include('partials.pwa-update-notice')
     </body>
 </html>

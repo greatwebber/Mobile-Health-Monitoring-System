@@ -1,4 +1,5 @@
 import './bootstrap';
+import './offline-drafts';
 import '@hotwired/turbo';
 
 import Alpine from 'alpinejs';
@@ -231,7 +232,54 @@ async function initializeHealthCharts() {
 document.addEventListener('turbo:before-render', destroyHealthCharts);
 document.addEventListener('turbo:load', initializeHealthCharts);
 
+let pendingServiceWorkerRegistration;
+let appUpdateDismissed = false;
+let appUpdateRequested = false;
+let reloadForServiceWorkerUpdate = false;
+
+function renderAppUpdateNotice() {
+    const notice = document.querySelector('[data-pwa-update-notice]');
+
+    if (!notice || !pendingServiceWorkerRegistration?.waiting || appUpdateDismissed) return;
+
+    notice.hidden = false;
+}
+
+document.addEventListener('click', (event) => {
+    if (!(event.target instanceof Element)) return;
+
+    const refreshButton = event.target.closest('[data-pwa-update-refresh]');
+
+    if (refreshButton) {
+        const waitingWorker = pendingServiceWorkerRegistration?.waiting;
+
+        if (!waitingWorker) return;
+
+        refreshButton.disabled = true;
+        refreshButton.textContent = 'Updating…';
+        appUpdateRequested = true;
+        waitingWorker.postMessage({ type: 'SKIP_WAITING' });
+
+        return;
+    }
+
+    if (event.target.closest('[data-pwa-update-dismiss]')) {
+        appUpdateDismissed = true;
+        const notice = document.querySelector('[data-pwa-update-notice]');
+        if (notice) notice.hidden = true;
+    }
+});
+
+document.addEventListener('turbo:load', renderAppUpdateNotice);
+
 if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (!appUpdateRequested || reloadForServiceWorkerUpdate) return;
+
+        reloadForServiceWorkerUpdate = true;
+        window.location.reload();
+    });
+
     window.addEventListener('load', async () => {
         try {
             const serviceWorkerUrl = document.querySelector('meta[name="pwa-service-worker"]')?.content;
@@ -241,11 +289,18 @@ if ('serviceWorker' in navigator) {
 
             const registration = await navigator.serviceWorker.register(serviceWorkerUrl, { scope: serviceWorkerScope });
 
+            if (registration.waiting && navigator.serviceWorker.controller) {
+                pendingServiceWorkerRegistration = registration;
+                renderAppUpdateNotice();
+            }
+
             registration.addEventListener('updatefound', () => {
                 const worker = registration.installing;
                 worker?.addEventListener('statechange', () => {
                     if (worker.state === 'installed' && navigator.serviceWorker.controller) {
-                        showConnectionStatus('An app update is ready. Refresh to use it.', true);
+                        pendingServiceWorkerRegistration = registration;
+                        appUpdateDismissed = false;
+                        renderAppUpdateNotice();
                     }
                 });
             });

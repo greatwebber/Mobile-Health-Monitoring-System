@@ -10,6 +10,7 @@ use App\Http\Controllers\EncounterObservationController;
 use App\Http\Controllers\HealthTimelineController;
 use App\Http\Controllers\ManagedAccountController;
 use App\Http\Controllers\MedicalHistoryController;
+use App\Http\Controllers\OfflineDraftSyncController;
 use App\Http\Controllers\PatientProfileController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ThresholdRuleController;
@@ -52,6 +53,7 @@ Route::middleware(['auth', 'audit.access'])->group(function () {
     Route::post('/admin/accounts', [ManagedAccountController::class, 'store'])->name('admin.accounts.store');
     Route::get('/admin/accounts/{managedUser}/edit', [ManagedAccountController::class, 'edit'])->name('admin.accounts.edit');
     Route::put('/admin/accounts/{managedUser}', [ManagedAccountController::class, 'update'])->name('admin.accounts.update');
+    Route::post('/offline-sync/patient-profile', [OfflineDraftSyncController::class, 'patientProfile'])->name('offline-sync.patient-profile');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

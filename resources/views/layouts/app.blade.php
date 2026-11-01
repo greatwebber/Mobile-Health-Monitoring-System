@@ -4,6 +4,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
         <meta name="csrf-token" content="{{ csrf_token() }}">
+        <meta name="current-user-id" content="{{ Auth::id() }}">
 
         <title>{{ isset($title) ? $title.' · ' : '' }}{{ config('app.name', 'EdeHealth Sentinel') }}</title>
         @include('partials.pwa-meta')
@@ -30,5 +31,6 @@
             </main>
         </div>
         <div id="connection-status" class="connection-status" role="status" aria-live="polite" hidden></div>
+        @include('partials.pwa-update-notice', ['aboveDock' => true])
     </body>
 </html>

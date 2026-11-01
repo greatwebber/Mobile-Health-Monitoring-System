@@ -51,8 +51,8 @@ This document is also the project's living implementation tracker. Update it whe
 | 2. Ethics, Privacy and Data Planning | Weeks 2–3 | Not started | — | — |
 | 3. UX, PWA Design and Architecture | Weeks 3–4 | In progress | — | Original mobile-first shell, role-aware bottom navigation and reload-free Turbo navigation implemented; formal wireframes and stakeholder review pending |
 | 4. Engineering Foundation | Weeks 4–6 | In progress | — | Laravel, authentication, account roles, tests and PWA shell implemented |
-| 5. Clinical Monitoring MVP | Weeks 6–9 | In progress | — | End-to-end non-AI monitoring, follow-up and immutable audit trail implemented; staff-administration UI and formal stakeholder review remain |
-| 6. Offline-Aware PWA Completion | Weeks 8–10 | In progress | — | Safe static caching, offline fallback and connection status implemented; offline drafts pending |
+| 5. Clinical Monitoring MVP | Weeks 6–9 | Ready for review | — | End-to-end non-AI monitoring, follow-up, immutable audit trail and staff-account administration are verified; formal stakeholder review remains |
+| 6. Offline-Aware PWA Completion | Weeks 8–10 | In progress | — | Encrypted drafts, safe synchronization and user-controlled update notification are implemented; automated PWA/HTTP audit passed and representative-device verification remains |
 | 7. AI Research Pipeline | Weeks 7–11 | Not started | — | — |
 | 8. AI Service and Product Integration | Weeks 11–13 | Not started | — | — |
 | 9. Verification and Hardening | Weeks 13–16 | Not started | — | — |
@@ -79,6 +79,10 @@ Add one row for every meaningful roadmap update.
 | 2026-10-31 | 5 | Clinician-approved threshold alerts implemented | Administrators can prepare immutable threshold drafts, clinicians independently approve or deactivate them, and only active approved rules evaluate newly recorded vital signs. Nurses and clinicians can acknowledge alerts, only clinicians can resolve them with notes, and patients can view only their own. No clinical rule is active by default; the fictional seed rule remains an inactive draft. MySQL migration, repeat seeding, production build, dependency audits and 87 automated tests with 473 assertions passed | Development team |
 | 2026-10-31 | 5 | Appointment and follow-up workflow implemented | Nurses and clinicians can schedule or reschedule future appointments, link follow-up to the originating encounter, assign a clinician and provide patient-visible instructions. Patients can review only their own schedule. Completion, cancellation and non-attendance require documented outcomes and become immutable; future visits cannot be falsely completed or marked as missed. Dashboard summaries, role-specific PWA navigation and one fictional upcoming appointment are included. MySQL migration, repeat seeding, production build, dependency audits and 93 automated tests with 510 assertions passed | Development team |
 | 2026-10-31 | 2, 4 and 5 | Immutable security and clinical audit trail implemented | Authentication success/failure/logout, authenticated sensitive-page access attempts and meaningful clinical record changes now create append-only audit events with actor, resource, route, request and network context. Metadata records changed field names without copying clinical values; failed-login identifiers are hashed. Only active administrators can search the responsive audit trail, and no mutation routes exist. MySQL migration, repeat seeding, production build, dependency audits and 99 automated tests with 553 assertions passed | Development team |
+| 2026-11-01 | 4 and 5 | Staff-account administration implemented | Active administrators can search and filter all accounts, provision nurse/clinician/administrator identities with generated staff profiles, maintain identity and professional details, and activate or deactivate access. Existing roles are immutable to protect clinical ownership; administrators cannot deactivate themselves, deactivation removes active database sessions, and inactive sessions are rejected globally. All changes are audited. Repeat seeding, production build, dependency audits and 105 automated tests with 584 assertions passed | Development team |
+| 2026-11-01 | 6 | Encrypted offline profile drafts and controlled synchronization implemented | The approved patient-profile form now stores pending changes in IndexedDB using a non-extractable Web Crypto AES-GCM key. Offline submissions remain visibly queued and unconfirmed; synchronization revalidates authentication and input, uses UUID receipts to prevent duplicate retries, and returns a conflict instead of overwriting a newer server version. Drafts and keys are removed on explicit logout, and the service worker never receives draft payloads. Migration, repeat seeding, production build, dependency audits and 111 automated tests with 618 assertions passed | Development team |
+| 2026-11-01 | 6 | Formal PWA foundation audit completed | Manifest metadata and icon dimensions, maskable assets, safe cache boundaries, versioned update handling, offline recovery, real XAMPP HTTP delivery and local runtime permissions were verified. Production build, formatting, dependency audits and 112 automated tests with 639 assertions passed. Browser installation and physical-device scenarios remain explicitly pending in the compatibility record | Development team |
+| 2026-11-01 | 6 | User-controlled PWA update experience implemented | Public, authentication and signed-in screens now expose an accessible update-ready card when a replacement service worker is waiting. Users can defer it or deliberately activate and refresh after an unsaved-change warning; first installation cannot trigger an unexpected reload. Cache version 3, production assets, formatting and 113 automated tests with 648 assertions passed | Development team |
 
 ---
 
@@ -632,7 +636,7 @@ The prediction study should be documented using the current TRIPOD+AI reporting 
 
 - [ ] Create user journeys and mobile-first wireframes.
 - [~] Define the original visual design system. — Teal clinical palette, typography, cards, app bar, bottom dock, focus states and responsive spacing are implemented; formal component documentation remains pending.
-- [~] Design online, offline, empty, loading and error states. — Offline, empty, connection, delayed page-loading and disabled-feature states are implemented; synchronization-specific and remaining workflow error states are pending.
+- [~] Design online, offline, empty, loading and error states. — Offline, empty, connection, delayed page-loading, encrypted-draft, queued-sync, retry, validation and conflict states are implemented; remaining workflow-specific error states continue iteratively.
 - [ ] Produce system architecture and entity-relationship diagrams.
 - [ ] Define caching, draft synchronization and conflict rules.
 - [ ] Specify the Laravel-to-AI API contract.
@@ -664,9 +668,9 @@ The prediction study should be documented using the current TRIPOD+AI reporting 
 
 - [x] Reproducible local setup. — Installation and XAMPP guidance documented in `README.md`.
 - [x] Secure authentication and role foundation. — Registration is patient-only; inactive accounts cannot authenticate.
-- [x] Initial database schema. — Authentication, sessions, jobs, cache, account authorization, patient/staff profiles, consent history, medical history, encounters, observations, results, threshold rules, clinical alerts and appointments migrated successfully.
+- [x] Initial database schema. — Authentication, sessions, jobs, cache, account authorization, patient/staff profiles, consent history, medical history, encounters, observations, results, threshold rules, clinical alerts, appointments, immutable audit logs and idempotent offline-sync receipts migrated successfully.
 - [~] Installable PWA shell. — Technical installability requirements are implemented; representative-device installation verification remains pending.
-- [x] Automated baseline test suite. — 99 tests and 553 assertions pass; PHP and JavaScript dependency audits report no known vulnerabilities.
+- [x] Automated baseline test suite. — 113 tests and 648 assertions pass; PHP and JavaScript dependency audits report no known vulnerabilities.
 
 **Exit criteria**
 
@@ -676,7 +680,7 @@ The prediction study should be documented using the current TRIPOD+AI reporting 
 
 **Activities**
 
-- [~] Implement patient and staff profiles. — Patient/staff records, typed identifiers, generated patient numbers, patient self-service editing and ownership policies are ready; staff administration UI remains pending.
+- [x] Implement patient and staff profiles. — Patient self-service and administrator-managed staff provisioning are complete with generated identifiers, professional details, immutable roles, account-state controls, session termination and least-privilege policies.
 - [x] Implement consent, medical history and encounters. — Versioned append-only consent, patient-managed structured history and role-protected encounter lifecycle are implemented and tested; institutional approval of final consent wording remains tracked in Phase 2.
 - [x] Implement symptoms, vital signs and relevant results. — Append-only structured symptoms, verified vital-sign snapshots and numeric/qualitative clinical results are implemented with units, timestamps, provenance and safe validation; flags are reproduced from source reports rather than inferred.
 - [x] Build the longitudinal timeline and trend charts. — Encounters, symptoms, verified vital signs and clinical results are combined chronologically; responsive Chart.js trends are restricted to verified measurements and loaded on demand.
@@ -689,7 +693,7 @@ The prediction study should be documented using the current TRIPOD+AI reporting 
 - [x] End-to-end patient monitoring workflow. — The demonstrated non-AI journey covers patient identity, consent/history, encounter capture, verified observations/results, trends, governed alerts and scheduled follow-up.
 - [x] Mobile-responsive dashboards. — Patient, clinical and administrator home experiences, encounter workspace, longitudinal timeline, active alerts and upcoming appointments are responsive.
 - [x] Health charts and alerts. — Responsive verified vital-sign trends and the governed threshold-alert review workflow are complete.
-- [~] Appointment and clinical-review functions. — Appointment follow-up and alert review are complete; AI prediction review belongs to Phase 8.
+- [x] Appointment and clinical-review functions. — Appointment follow-up and alert clinical review are complete; the separate AI prediction-review workflow remains correctly scoped to Phase 8.
 - [x] Permission and workflow tests. — Profile, consent, medical-history, encounter, observation, result, timeline, threshold governance, alert and appointment ownership/workflow boundaries are covered.
 
 **Exit criteria**
@@ -701,22 +705,22 @@ The prediction study should be documented using the current TRIPOD+AI reporting 
 **Activities**
 
 - [x] Implement safe static caching and update handling. — Only safe static assets are runtime-cached; navigation uses the network with an offline fallback.
-- [ ] Implement approved offline drafts using IndexedDB.
-- [ ] Build synchronization, retry and conflict handling.
-- [~] Add connection and synchronization indicators. — Online/offline connection status and accessible page-navigation feedback are implemented; synchronization status awaits the draft queue.
-- [~] Verify logout and cache-clearing behavior. — Private pages are not cached; explicit draft/cache cleanup awaits offline-draft implementation.
+- [x] Implement approved offline drafts using IndexedDB. — Patient-profile changes are the first approved non-critical draft type and are encrypted with a non-extractable AES-GCM key before IndexedDB storage; critical clinical forms remain server-only.
+- [x] Build synchronization, retry and conflict handling. — Authenticated server validation, UUID idempotency receipts, connectivity retry and optimistic profile-version comparison prevent duplicate or silent overwrite behavior.
+- [x] Add connection and synchronization indicators. — Accessible states distinguish locally saved, queued/unconfirmed, synchronizing, completed, validation, authentication, retry and conflict outcomes.
+- [x] Verify logout and cache-clearing behavior. — Explicit logout removes the current user's encrypted drafts and browser key before session termination; private pages and draft payloads remain outside service-worker caches.
 - [ ] Test installation and operation on representative devices.
 
 **Deliverables**
 
-- [ ] Installable, updateable and offline-aware PWA.
-- [ ] Synchronization test report.
-- [ ] PWA audit report.
-- [ ] Device-compatibility record.
+- [~] Installable, updateable and offline-aware PWA. — Technical functionality is implemented; representative-device installation and offline testing remain.
+- [x] Synchronization test report. — Automated coverage verifies successful sync, duplicate retry idempotency, stale-version conflict refusal, authorization, validation, encrypted client storage hooks and cache separation.
+- [x] PWA audit report. — Automated foundation and real XAMPP HTTP-delivery evidence, findings and remaining limitations are recorded in `docs/PWA_AUDIT.md`.
+- [x] Device-compatibility record. — The representative target matrix, repeatable procedure, acceptance rules and current execution evidence are recorded in `docs/DEVICE_COMPATIBILITY.md`; device rows remain pending until executed.
 
 **Exit criteria**
 
-- [ ] The application handles connection loss without exposing sensitive cached data or duplicating records.
+- [~] The application handles connection loss without exposing sensitive cached data or duplicating records. — Automated safety checks pass for the approved profile draft; representative-device verification remains required.
 
 ### Phase 7 — AI Research Pipeline (Weeks 7–11)
 

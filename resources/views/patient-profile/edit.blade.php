@@ -20,9 +20,25 @@
             <div class="mt-6 rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-sm font-semibold text-emerald-900" role="status">
                 Your health profile was updated successfully.
             </div>
+        @elseif (session('status') === 'offline-profile-synchronized')
+            <div class="mt-6 rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-sm font-semibold text-emerald-900" role="status">Your encrypted offline draft synchronized successfully.</div>
         @endif
 
-        <form method="POST" action="{{ route('patient-profile.update') }}" class="mt-8 space-y-6">
+        <div data-offline-draft-panel class="mt-6 rounded-2xl border border-sky-200 bg-sky-50 px-5 py-4" role="status" aria-live="polite" hidden>
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                    <p class="text-sm font-black text-sky-950" data-offline-draft-title>Private draft</p>
+                    <p class="mt-1 text-xs leading-5 text-sky-800" data-offline-draft-message></p>
+                </div>
+                <button type="button" data-offline-draft-discard class="button-secondary shrink-0">Discard local draft</button>
+            </div>
+        </div>
+
+        <form method="POST" action="{{ route('patient-profile.update') }}" class="mt-8 space-y-6"
+            data-offline-draft="patient-profile"
+            data-offline-owner="{{ Auth::id() }}"
+            data-offline-sync-url="{{ route('offline-sync.patient-profile') }}"
+            data-offline-base-version="{{ $profile->updated_at->toISOString() }}">
             @csrf
             @method('PATCH')
 
@@ -122,8 +138,11 @@
             </section>
 
             <div class="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <p class="max-w-xl text-xs leading-5 text-slate-500">Profile updates are validated and stored on the server. Offline profile editing is not enabled in this release.</p>
-                <button type="submit" class="button-primary min-h-12 px-7">Save health profile</button>
+                <p class="max-w-xl text-xs leading-5 text-slate-500">On supported browsers, pending changes are encrypted locally. An offline submission is only queued—not confirmed—until the server validates and synchronizes it.</p>
+                <div class="flex flex-col gap-2 sm:flex-row">
+                    <button type="button" data-offline-draft-save class="button-secondary min-h-12 justify-center" hidden>Save encrypted draft</button>
+                    <button type="submit" class="button-primary min-h-12 px-7">Save health profile</button>
+                </div>
             </div>
         </form>
     </div>

@@ -10,6 +10,7 @@ EdeHealth Sentinel is an installable Progressive Web Application for longitudina
 - Secure registration, login, password reset and profile management.
 - Patient-only public registration with protected clinical and administrator roles.
 - Active/inactive account enforcement.
+- Administrator account register with staff provisioning, immutable roles, professional-profile maintenance and session termination on deactivation.
 - Patient and staff profile records with least-privilege authorization.
 - Patient self-service health-profile form with validated clinical identifiers.
 - Patient-managed structured medical history with clinician/nurse read access.
@@ -25,10 +26,12 @@ EdeHealth Sentinel is an installable Progressive Web Application for longitudina
 - Reload-free Turbo Drive navigation with delayed, accessible app-bar loading feedback.
 - Clinical-page snapshot caching and hover prefetching disabled to avoid retaining sensitive rendered pages.
 - PWA manifest, original icons, service worker and offline fallback.
+- Accessible update-ready notice with user-controlled service-worker activation and refresh.
 - Safe caching limited to versioned static assets; private pages are not precached.
-- Automated tests covering authentication, accounts, clinical-profile permissions, consent history, PWA metadata and caching boundaries.
+- AES-GCM-encrypted patient-profile drafts in IndexedDB with visible queued state, authenticated retry, idempotency receipts and optimistic conflict detection.
+- Automated tests covering authentication, account administration, clinical permissions and workflows, audit privacy, PWA metadata and caching boundaries.
 
-See [ROADMAP.md](ROADMAP.md) for the full scope and implementation status.
+See [ROADMAP.md](ROADMAP.md) for the full scope and implementation status. The current PWA evidence is recorded in [docs/PWA_AUDIT.md](docs/PWA_AUDIT.md), with the remaining representative-device checks in [docs/DEVICE_COMPATIBILITY.md](docs/DEVICE_COMPATIBILITY.md).
 
 ## Technology
 
@@ -121,7 +124,9 @@ php artisan test
 
 The service worker caches only the offline page, manifest, icons and safe static build assets. Navigation requests use the network and fall back to the offline page when unavailable. Authenticated HTML and clinical API responses must not be indiscriminately cached.
 
-Offline clinical drafts and synchronization are planned but not implemented yet. They require encryption, conflict handling, authentication revalidation and server confirmation before they can be considered safe.
+Patient-profile changes are the first approved non-critical offline draft. Pending values are encrypted with a non-extractable AES-GCM browser key before IndexedDB storage. Submission remains visibly **queued and unconfirmed** while offline; synchronization occurs only after connectivity and authentication return, server validation succeeds and the stored profile version still matches. UUID receipts make retries idempotent, while a version mismatch preserves the local draft and refuses to overwrite newer server data.
+
+Explicit logout removes the current user's encrypted profile draft and browser key before ending the session. Draft payloads are never passed to or cached by the service worker. This browser-level protection reduces plaintext-at-rest exposure but does not replace device encryption, operating-system access controls or institutional approval. Critical clinical actions remain server-only.
 
 ## AI Boundary
 

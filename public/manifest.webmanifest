@@ -3,6 +3,8 @@
     "name": "EdeHealth Sentinel",
     "short_name": "EdeHealth",
     "description": "Clinician-supervised health monitoring for the Federal Polytechnic Ede community.",
+    "lang": "en",
+    "dir": "ltr",
     "start_url": "./",
     "scope": "./",
     "display": "standalone",
